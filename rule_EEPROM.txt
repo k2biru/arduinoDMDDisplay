@@ -1,0 +1,76 @@
+============================
+===PETA MEMORI EEPROM   ====
+============================
+
+
+
+Untuk ATmega 328
+==========================
+Maksimal 1024 byte
+diawali dari alamat 0 ~ 1023
+==
+pembagiana alamat
+alamat 	isi
+0		L8bit kecerahan
+1		H8bit kecerahan
+2		Sighned Char  callibration temp
+3		L8bit speed Marquee (unsigned int)
+4		H8bit speed Marquee
+5
+6
+7
+8 
+
+ 
+==========================
+
+
+Untuk ESP8266
+512kB
+==========================
+setType = 1  //SetAPSSID &pass
+setType = 2  //SetSSID &pass
+
+
+==
+pembagian alamat
+alamat	isi
+11		[APSSID char]~
+30		[APSSID char]
+31		[APSSID pass char]~
+50		[APSSID pass char]
+
+51		[Port char] 			[NOT USE]
+52		[wifi Channel]			1~14;
+53		[8bit of settings]		[Not Used yet]
+
+56		[SSID char]~
+76		[SSID char]~			
+77		[SSID pass char]~
+97		[SSID pass char]~			
+
+101		[HTTPThink char 1]~
+200		[HTTPThink char 1]
+201		[HTTPThink char 2]~
+300		[HTTPThink char 2]
+301		[HTTPThink char 3]~
+400		[HTTPThink char 3]
+
+401		[HTTP Weather ]~
+500		[HTTP Weather ]
+
+==
+
+========
+8bit of settings 
+0bABCDEFGH
+
+A		=	Auto Online Update Time 					[1=true; 0=false]
+B		=	"/update" argumen enable 					[1=true; 0=false]
+C		=	Auto connect wifi							[1=true; 0=false] 
+D		=	"No Data" massage if no internet (no Server)[1=true; 0=false]
+
+E		=	Weather Ennable								[1=true; 0=false]
+F		=
+G		=
+H		=

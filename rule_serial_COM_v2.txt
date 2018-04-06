@@ -1,0 +1,164 @@
+rule Serial ESP v2
+
+Format data serial
+
+###===========================================
+    "#<commandCode><data>"
+	
+###===========================================
+
+
+###===========================================
+<commandCode>
+digit = 7;
+
+ 1 digit only
+ 
+ first digit =
+ 0= nothing
+ C= set Clock
+ D= set Date
+ B= set Brighness
+ T= set Temp tolerance
+ S= set default speed of marque
+ m= set to display still MSG
+ M= set to display marquee MSG
+ W= Weather data
+ digit 2~7 
+ if (second digit = 0) <000000> 
+ if (second digit = C) <XXYY> XX = hour(in 24) ; YY = minute ;
+ if (second digit = D) <XXYY> XX = date ; YY = mouth ; ZZ = year (last two digit of year);
+ if (second digit = B) <XXXX> XXXX = brighness in 8 bit (0~1023 logaritmic function);
+ if (second digit = T) <XYY> X = sign ('+' if positive, '-' if negative) ; YY = data in int;
+ if (second digit = S) <XXX> XXX = speed marque on mili Second ;
+ if (second digit = m) <XXYYZZ> XX = x location ; XX = y location ; ZZ = time (in second);
+ if (second digit = M) <YXX> Y =('B'= bold; 'M'=mid ;0 = mini ; XX = speed marque on mili Second x 10;
+ if (second digit = W) <X> X = ('T'= transfer, 'R' = receive, 'K' = OK) ;
+
+###===========================================
+
+
+###===========================================
+<data>
+data of MSG
+
+
+###===========================================
+
+example
+
+===
+nothing
+ #0000000 
+ #0000000
+ 
+===
+set Clock to 10:20:03
+ #C102003
+ #C102003
+
+===
+set date to 1 July 2017
+ #D010717
+
+===
+set Brighness to 1023 (full)
+ #B1023
+set Brighness to 10 
+ #B0010
+
+
+===
+set Temperature tolerance -1
+ #T-1
+set Temperature tolerance +2
+ #T+2
+ 
+===
+set default speed marque to 30 ms
+ #M000030
+set default speed marque to 500 ms
+ #M000500
+
+===
+set Display MSG "Hello" in (16,3) 5 second
+ #m160305HEllo
+set static msg "127.1.1.1" in (0,3) 2 second
+ #m000302127.1.1.1
+
+===
+set marquee MSG "This is from IOT http" speed 30 ms (standard)
+ #M000030This is from IOT http
+set marquee MSG "Marquee Slow Speed" speed 1000 ms (very slow)
+ #M001000Marquee Ultra Slow Speed
+set marquee MSG "Marquee Ultra Slow Speed" speed 10000 ms (very very slow)
+ #M010000Marquee Ultra Slow Speed
+ 
+===
+ weather will transfer data
+  #WT 
+ weather ready for receive data
+  #WR
+
+simulation of weather data transfer
+       Main(transifer)             Slave(Receiver)
+============================||================================
+|#WT
+|                             #
+|<data trasfer in struct>											
+==============================================================(if the receiver get data struct)
+|                             #WK
+==============================================================(if the receiver doesn't get data struct from several time (<3x))
+|                             #WR
+|<data trasfer in struct>                                     (timeOut from reading data struct)
+|                             #WR
+|<data trasfer in struct>                                     (data readed by receiver)
+|                             #WK                             
+  
+data struct for weather data trasfer
+
+
+struct weatherDat
+{
+  byte date;
+  byte month;
+  float minTemp;
+  float maxTemp;
+  byte humidity;
+  float windSpeed;
+  unsigned int windBearing;
+  float pressure;
+  byte cloud;
+  char[6] icon;
+  char[30] summary;
+}; 
+
+=======================================
+Simulation communication
+=======================================
+
+Mode StandAlone (ATMEGA328 Only)
+		ATMEGA328 Main            ESP8266 Slave
+============================||================================
+(Check for 2 sec if there 
+sigh from ESP8266)
+<Scan Serial for "#m160305HEllo">
+
+(if time out then standalone mode =true)
+
+
+Mode Hibrid
+		ATMEGA328 Main            ESP8266 Slave
+============================||================================
+(Check for 2 sec if there sigh from ESP8266)
+<Scan Serial for "#m160305HEllo">
+								#m160305HEllo
+(sighnal from ESP8266 then standalone mode = false)
+
+
+
+
+
+
+
+

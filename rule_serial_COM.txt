@@ -1,0 +1,99 @@
+rule Serial ESP
+
+Format data serial
+
+###===========================================
+    "#<debugCode><commandCode><data>"
+###===========================================
+
+###===========================================
+<debugCode>
+digit =1;
+0=debug
+1=notDebug
+###===========================================
+
+
+###===========================================
+<commandCode>
+digit = 7;
+
+ 1 digit only
+ 
+ first digit =
+ 0= nothing
+ C= set Clock
+ D= set Date
+ B= set Brighness
+ T= set Temp tolerance
+ S= set default speed of marque
+ m= set to display still MSG
+ M= set to display marquee MSG
+ digit 2~7 
+ if (second digit = 0) <000000> 
+ if (second digit = C) <XXYY> XX = hour(in 24) ; YY = minute ;
+ if (second digit = D) <XXYY> XX = date ; YY = mouth ; ZZ = year (last two digit of year);
+ if (second digit = B) <XXXX> XXXX = brighness in 8 bit (0~1023 logaritmic function);
+ if (second digit = T) <XYY> X = sign ('+' if positive, '-' if negative) ; YY = data in int;
+ if (second digit = S) <XXXXXX> XXXXXX = speed marque on mili Second ;
+ if (second digit = m) <XXYYZZ> XX = x location ; XX = y location ; ZZ = time (in second);
+ if (second digit = M) <XXXXXX> XXXXXX = speed marque on mili Second ;
+
+###===========================================
+
+
+###===========================================
+<data>
+data of MSG
+
+
+###===========================================
+
+example
+
+===
+nothing
+ #00000000 
+ #10000000
+ 
+===
+set Clock to 10:20:03
+ #1C102003
+ #1C102003
+
+===
+set date to 1 July 2017
+ #1D010717
+
+===
+set Brighness to 1023 (full)
+ #1B1023
+set Brighness to 10 
+ #1B0010
+
+
+===
+set Temperature tolerance -1
+ #1T-1
+set Temperature tolerance +2
+ #1T+2
+ 
+===
+set default speed marque to 30 ms
+ #1M000030
+set default speed marque to 500 ms
+ #1M000500
+
+===
+set Display MSG "Hello" in (16,3) 5 second
+ #1m160305HEllo
+set static msg "127.1.1.1" in (0,3) 2 second
+ #1m000302127.1.1.1
+
+===
+set marquee MSG "This is from IOT http" speed 30 ms (standard)
+ #1M000030This is from IOT http
+set marquee MSG "Marquee Slow Speed" speed 1000 ms (very slow)
+ #1M001000Marquee Ultra Slow Speed
+set marquee MSG "Marquee Ultra Slow Speed" speed 10000 ms (very very slow)
+ #1M010000Marquee Ultra Slow Speed
